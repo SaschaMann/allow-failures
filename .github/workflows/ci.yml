@@ -1,0 +1,43 @@
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests
+name: CI
+
+on:
+  - pull_request
+
+jobs:
+  test:
+    name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.version == 'nightly' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        version:
+          - '1.0'
+          - '1.5'
+          - 'nightly'
+        os:
+          - ubuntu-latest
+          - macOS-latest
+          - windows-latest
+        arch:
+          - x64
+    steps:
+      - uses: actions/checkout@v2
+      
+      # "Build"
+      - name: Fail on nightly, except on linux
+        id: build
+        if: matrix.version == 'nightly' && matrix.os != 'ubuntu-latest'
+        run: exit 1
+      
+      - name: Save PR report
+        run: |
+          mkdir -p ./pr
+          echo ${{ github.event.number }} > ./pr/NR
+          echo ${{ steps.build.outcome }} > ./pr/outcome
+      
+      - uses: actions/upload-artifact@v2
+        with:
+          name: pr
+          path: pr/
