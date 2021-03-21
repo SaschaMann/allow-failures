@@ -8,7 +8,6 @@ jobs:
   test:
     name: Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}
     runs-on: ${{ matrix.os }}
-    continue-on-error: ${{ matrix.version == 'nightly' }}
     strategy:
       fail-fast: false
       matrix:
@@ -27,6 +26,7 @@ jobs:
       
       # "Build"
       - name: Fail on nightly, except on linux
+        continue-on-error: ${{ matrix.version == 'nightly' }}
         id: build
         if: matrix.version == 'nightly' && matrix.os != 'ubuntu-latest'
         run: |
