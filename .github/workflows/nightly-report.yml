@@ -32,7 +32,7 @@ jobs:
               return artifact.name == "pr"
             })
             
-            for (artifact of matchArtifacts.entries()) {
+            for (artifact of matchArtifacts) {
               const download = await github.actions.downloadArtifact({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
