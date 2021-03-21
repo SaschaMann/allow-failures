@@ -34,6 +34,7 @@ jobs:
           else
             exit 0
           fi
+        shell: bash
       
       - name: Save PR report
         run: |
@@ -41,6 +42,7 @@ jobs:
           echo ${{ github.event.number }} > ./pr/NR
           echo ${{ steps.build.outcome }} > ./pr/outcome
           echo "Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}" > ./pr/name
+        shell: bash
       
       - uses: actions/upload-artifact@v2
         with:
