@@ -68,11 +68,11 @@ jobs:
               const outcome = fs.readFileSync(path.join(dir, 'outcome')) === 'success' ? '✔️' : '❌'
               message += `| ${name} | ${outcome} |\n`
               issue_number = Number(fs.readFileSync(path.join(dir, 'NR'))
-            }
+            })
             
             await github.issues.createComment({
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: issue_number,
               body: message
-            });
+            })
