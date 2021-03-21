@@ -46,5 +46,5 @@ jobs:
       
       - uses: actions/upload-artifact@v2
         with:
-          name: pr
+          name: pr-${{ matrix.version }}-${{ matrix.os }}-${{ matrix.arch }}-${{ github.event_name }}
           path: pr/
