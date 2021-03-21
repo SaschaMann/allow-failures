@@ -39,9 +39,9 @@ jobs:
       - name: Save PR report
         run: |
           mkdir -p ./pr
-          echo ${{ github.event.number }} > ./pr/NR
-          echo ${{ steps.build.outcome }} > ./pr/outcome
-          echo "Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}" > ./pr/name
+          echo -n ${{ github.event.number }} > ./pr/NR
+          echo -n ${{ steps.build.outcome }} > ./pr/outcome
+          echo -n "Julia ${{ matrix.version }} - ${{ matrix.os }} - ${{ matrix.arch }} - ${{ github.event_name }}" > ./pr/name
         shell: bash
       
       - uses: actions/upload-artifact@v2
