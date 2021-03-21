@@ -29,7 +29,7 @@ jobs:
         continue-on-error: ${{ matrix.version == 'nightly' }}
         id: build
         run: |
-          if [[ "${{ matrix.version }}" == "nightly" || "${{ matrix.os }}" != "ubuntu-latest" ]]; then
+          if [[ "${{ matrix.version }}" == "nightly" && "${{ matrix.os }}" != "ubuntu-latest" ]]; then
             exit 1
           else
             exit 0
