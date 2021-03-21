@@ -1,0 +1,78 @@
+# https://securitylab.github.com/research/github-actions-preventing-pwn-requests
+name: Comment build report on pull request
+
+# read-write repo token
+# access to secrets
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
+    steps:
+      - name: 'Download artifact'
+        uses: actions/github-script@v3.1.0
+        with:
+          script: |
+            const fs = require('fs')
+          
+            const artifacts = await github.actions.listWorkflowRunArtifacts({
+               owner: context.repo.owner,
+               repo: context.repo.repo,
+               run_id: ${{ github.event.workflow_run.id }},
+            })
+            
+            const matchArtifacts = artifacts.data.artifacts.filter((artifact) => {
+              return artifact.name == "pr"
+            })
+            
+            for (artifact of matchArtifacts.entries()) {
+              const download = await github.actions.downloadArtifact({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                artifact_id: artifact.id,
+                archive_format: 'zip',
+              })
+              
+              fs.writeFileSync(`${{ github.workspace }}/pr-${artifact.id}.zip`, Buffer.from(download.data))
+            }
+            
+      - run: |
+          for f in *.zip; do
+            unzip "$f" -d "${f%.zip}/"
+          done
+          rm *.zip
+        shell: bash
+
+      - name: 'Comment on PR'
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const fs = require('fs')
+            const path = require('path')
+            
+            // Ugly af
+            let issue_number = 0
+            
+            let message = '| Build | Status |\n|-------|--------|\n'
+            
+            fs.readdirSync('${{ github.workspace }}').forEach(dir => {
+              const name = fs.readFileSync(path.join(dir, 'name'))
+              const outcome = fs.readFileSync(path.join(dir, 'outcome')) === 'success' ? '✔️' : '❌'
+              message += `| ${name} | ${outcome} |\n`
+              issue_number = Number(fs.readFileSync(path.join(dir, 'NR'))
+            }
+            
+            await github.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: issue_number,
+              body: message
+            });
