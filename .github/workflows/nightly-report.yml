@@ -66,7 +66,7 @@ jobs:
             fs.readdirSync('${{ github.workspace }}').forEach(dir => {
               const name = fs.readFileSync(path.join(dir, 'name'))
               const outcome = fs.readFileSync(path.join(dir, 'outcome')) === 'success' ? '✔️' : '❌'
-              message += `| ${name} | ${outcome} |\n`
+              message += `| ${name.replace('\n', '')} | ${outcome.replace('\n', '')} |\n`
               issue_number = Number(fs.readFileSync(path.join(dir, 'NR')))
             })
             
