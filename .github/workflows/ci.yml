@@ -28,7 +28,6 @@ jobs:
       - name: Fail on nightly, except on linux
         continue-on-error: ${{ matrix.version == 'nightly' }}
         id: build
-        if: matrix.version == 'nightly' && matrix.os != 'ubuntu-latest'
         run: |
           if [[ "${{ matrix.version }}" == "nightly" || "${{ matrix.os }}" != "ubuntu-latest" ]]; then
             exit 1
